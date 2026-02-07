@@ -249,7 +249,7 @@ async function compartilharEscala() {
     atualizadoEm: new Date()
   });
 
-  const link = `${window.location.origin}/rosa/escala.html?uid=${user.uid}`;
+  const link = `${window.location.origin}/escala?uid=${user.uid}`;
 
   if (navigator.share) {
     navigator.share({
