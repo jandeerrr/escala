@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Histórico de Escalas</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<style>
+body { font-family: Arial; background:#f4f4f4; padding:20px; }
+.bloco { background:white; padding:15px; margin-bottom:15px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+button { margin-right:5px; padding:5px 10px; border:none; border-radius:4px; cursor:pointer; }
+.ver { background:#4CAF50; color:white; }
+.apagar { background:#e53935; color:white; }
+.voltar { background:#555; color:white; margin-bottom:15px; }
+</style>
+</head>
+<body>
+
+<button class="voltar" onclick="window.location.href='index.html'">⬅ Voltar ao Painel</button>
+
+<h2>📚 Histórico de Escalas Salvas</h2>
+<div id="listaHistorico"></div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCtOYelfW1Kq2lLbH0aoRbUCqnVuol6vvQ",
+  authDomain: "cadastro-c2424.firebaseapp.com",
+  projectId: "cadastro-c2424",
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const listaHistorico = document.getElementById("listaHistorico");
+
+auth.onAuthStateChanged(user => {
+  if (!user) {
+    alert("Faça login primeiro");
+    window.location.href = "index.html";
+  } else {
+    carregarHistorico();
+  }
+});
+
+async function carregarHistorico() {
+  const user = auth.currentUser;
+  const docRef = db.collection("users").doc(user.uid);
+  const doc = await docRef.get();
+
+  listaHistorico.innerHTML = "";
+
+  if (!doc.exists) {
+    listaHistorico.innerHTML = "<p>⚠️ Documento do usuário não encontrado.</p>";
+    return;
+  }
+
+  const historico = doc.data().historico;
+
+  if (!historico || historico.length === 0) {
+    listaHistorico.innerHTML = "<p>📭 Nenhuma escala salva ainda.</p>";
+    return;
+  }
+
+  historico.slice().reverse().forEach((item, index) => {
+    const data = item.criadoEm
+      ? new Date(item.criadoEm).toLocaleString()
+      : "Data desconhecida";
+
+    const div = document.createElement("div");
+    div.className = "bloco";
+
+    div.innerHTML = `
+      <strong>📅 Criado em:</strong> ${data}<br>
+      <strong>📆 Semana:</strong> ${item.semanaReferencia || "—"}<br><br>
+      <button class="ver" onclick="verDetalhes(${historico.length - 1 - index})">Ver Escala</button>
+      <button class="apagar" onclick="apagar(${historico.length - 1 - index})">Apagar</button>
+    `;
+
+    listaHistorico.appendChild(div);
+  });
+}
+
+
+
+async function verDetalhes(index) {
+  const user = auth.currentUser;
+  const doc = await db.collection("users").doc(user.uid).get();
+  const historico = doc.data().historico || [];
+  const escala = historico[index].escala;
+
+  let texto = "📋 ESCALA SALVA\n\n";
+
+  for (let dia in escala) {
+    texto += "🗓 " + dia + "\n";
+
+    escala[dia].forEach(p => {
+      texto += `   • ${p.hora} - ${p.nome}\n`;
+    });
+
+    texto += "\n";
+  }
+
+  alert(texto);
+}
+
+
+async function apagar(index) {
+  if (!confirm("Deseja realmente apagar essa escala?")) return;
+
+  const user = auth.currentUser;
+  const ref = db.collection("users").doc(user.uid);
+  const doc = await ref.get();
+  let historico = doc.data().historicoEscalas || [];
+
+  historico.splice(index, 1);
+
+  await ref.update({ historicoEscalas: historico });
+  carregarHistorico();
+}
+</script>
+
+</body>
+</html>

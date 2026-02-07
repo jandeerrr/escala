@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Painel Admin</title>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<style>
+/* (seu CSS mantido igual) */
+body { font-family: Arial; background: linear-gradient(135deg,#4CAF50,#2e7d32); margin:0; padding:10px }
+.card{background:#fff;padding:02px;border-radius:12px;box-shadow:0 8px 18px rgba(0,0,0,.15);margin-bottom:20px}
+.recepcionista-card{display:flex;align-items:center;gap:8px;margin:6px 0;background:#f9f9f9;padding:6px 10px;border-radius:8px}
+.recepcionista-card img{width:35px;height:35px;border-radius:50%;object-fit:cover;border:2px solid #4CAF50}
+#diasSemana{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
+</style>
+</head>
+<div class="topo-admin">
+  <div class="titulo-painel">
+    <img src="logo-igreja.png" alt="Logo Igreja" class="logo-painel">
+    <span>ADM - Igreja Adventista do Sétimo Dia</span>
+</div>
+
+  <button onclick="logout()" id="btnLogout" class="btn-sair">🚪 Sair</button>
+</div>
+
+<div id="menuAuth">
+  <h2>🔐 Acesso Admin</h2>
+  <input type="text" id="nomeAdmin" placeholder="Nome da clínica (somente no cadastro)"><br><br>
+  <input type="email" id="email" placeholder="Email"><br><br>
+  <input type="password" id="senha" placeholder="Senha"><br><br>
+
+  <button onclick="cadastrarAdmin()">Cadastrar Admin</button>
+  <button onclick="login()">Entrar</button>
+  <button onclick="recuperarSenha()">Esqueci a senha</button>
+  <button onclick="logout()" id="btnLogout" style="display:none;">🚪 Sair</button>
+
+  <button onclick="window.location.href='historico.html'">📚 Ver Histórico</button>
+
+  <hr>
+</div>
+
+</div>
+
+<hr>
+
+<div id="areaAdmin" style="display:none">
+
+  <div class="section-card">
+    <h2>👩‍💼 Cadastrar Recepcionista</h2>
+    <input type="text" id="nomeRecep" placeholder="Nome da recepcionista">
+    <input type="file" id="fotoRecep">
+    <button class="btn primary full" onclick="cadastrar()">💾 Salvar</button>
+
+
+  <button class="btn link" onclick="window.location.href='historico.html'">
+    📚 Histórico
+  </button>
+	<h3 class="secao-titulo" onclick="toggleListaRecep()" style="cursor:pointer;">
+  👩‍💼 Recepcionistas Cadastradas ▼
+</h3>
+
+<div id="listaRecepcionistas" class="lista-recep escondido"></div>
+
+  </div>
+
+  <div class="top-actions">
+    <button class="btn success" onclick="compartilharEscala()">📤 Compartilhar Escala</button>
+    <button class="btn danger" onclick="limparEscala()" id="btnLimpar" style="display:none;">🗑 Limpar Escala</button>
+  </div>
+
+  <h2 id="tituloMes" class="titulo-mes">📆 Escala do Mês</h2>
+  <div id="diasSemana"></div>
+
+  <hr>
+
+  <h2>📊 Escala Atual</h2>
+  <div id="historico"></div>
+</div>
+
+<style>
+/*backround*/
+body {
+    font-family: Arial;
+    background: linear-gradient(135deg, #2575fc, #fff);
+    margin: 0;
+    padding: 10px;
+}
+.titulo-painel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 18px 28px;
+    margin: 0px auto;
+    width: fit-content;
+
+    color: #ffffff;
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.titulo-painel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+
+.logo-painel {
+    height: 42px;
+    width: auto;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+	
+/* ===== Botões modernos ===== */
+.btn {
+  border: 10;
+  border-radius: 30px;
+  padding: 1px 18px;
+  font-size: 14px;
+  cursor: pointer;
+  margin: 01px 0px;
+  transition: all .2s ease;
+  display: inline-block;
+}
+
+/* ===== Ações do topo ===== */
+.top-actions {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/*drop-delete*/
+.secao-titulo{
+  background: linear-gradient(90deg,#6a11cb,#2575fc);
+  color:white;
+  padding:10px 15px;
+  border-radius:10px;
+  font-weight:bold;
+  margin-top:15px;
+  user-select:none;
+}
+
+.lista-recep{
+  margin-top:10px;
+  display:grid;
+  gap:8px;
+  transition: all .3s ease;
+}
+
+.escondido{
+  display:none;
+}
+
+.recepcionista-card{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#f5f7fa;
+  padding:8px 12px;
+  border-radius:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.recepcionista-card img{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+
+
+.modal {
+  display:none;
+  position:fixed;
+  z-index:9999;
+  left:0; top:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.8);
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-content {
+  background:#111;
+  padding:20px;
+  border-radius:10px;
+  text-align:center;
+  max-width:90%;
+}
+
+.modal-content img {
+  max-width:100%;
+  max-height:60vh;
+  border-radius:8px;
+  margin-bottom:15px;
+}
+
+.fechar {
+  color:#fff;
+  float:right;
+  font-size:28px;
+  cursor:pointer;
+}
+@media (max-width: 600px) {
+  #diasSemana {
+    grid-template-columns: repeat(4, 1fr); /* 4 cards por linha */
+    gap: 01px;
+  }
+
+  .card {
+    padding: 01px;
+  }
+
+  input, button {
+    font-size: 14px; /* inputs e botões menores no mobile */
+  }
+}
+.mes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dia-item {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 6px;
+  font-size: 12px;
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.08);
+}
+
+/*botao compartilhar flutuante*/
+
+#btnShareFloat {
+  position: fixed;
+  bottom: 20px;
+  right: 05px;
+  width: 60px;
+  height: 50px;
+  border-radius: 100%;
+  border: none;
+  background: #6a11cb;
+  color: #f9f9f9;
+  font-size: 09px;
+  box-shadow: 0 6px 5px rgb(0 0 0);
+  cursor: pointer;
+  z-index: 9999;
+  display: none; /* aparece só quando logado */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#btnShareFloat:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+}
+
+#btnShareFloat:active {
+  transform: scale(0.95);
+}
+
+
+</style>
+
+
+
+
+
+
+<div id="escalaPrint" style="position:absolute; left:-9999px; top:0; width:600px; background:#fff; padding:20px;"></div>
+<button id="btnShareFloat" onclick="compartilharEscala()">📤 Compartilhar Escala</button>
+
+<script src="app.js"></script>
+</body>
+</html>
