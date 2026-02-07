@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Escala do Mês</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #4e73df, #1cc88a);
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+
+/* ===== CABEÇALHO ===== */
+.header { margin-bottom: 25px; }
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  padding: 14px 18px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  color: white;
+}
+
+.logo {
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
+  background: white;
+  padding: 6px;
+  object-fit: contain;
+}
+
+.header h1 { margin: 0; font-size: 24px; }
+.header p { margin: 2px 0 0; opacity: 0.9; font-size: 14px; }
+
+/* ===== CARDS DOS DIAS ===== */
+.card-dia {
+  background: white;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-dia:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.12);
+}
+
+.card-dia h3 {
+  margin: 0 0 10px 0;
+  color: #4e73df;
+  font-size: 17px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+}
+
+/* ===== MINI CARDS ===== */
+.lista-recepcao {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.recepcionista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f8f9fc;
+  border-radius: 12px;
+  padding: 10px 6px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.recepcionista:hover {
+  background: #e2e6f5;
+  transform: translateY(-2px);
+}
+
+.recepcionista img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #4e73df;
+  margin-bottom: 6px;
+}
+
+.hora {
+  font-weight: bold;
+  color: #1cc88a;
+  background: rgba(28,200,138,0.12);
+  padding: 2px 6px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="topo">
+      <img src="logo-igreja.png" class="logo" alt="Logo Igreja">
+      <div>
+        <h1 id="tituloMes">📅 Escala do Mês</h1>
+        <p>Equipe de Recepção • ADM - Igreja Adventista do Sétimo Dia</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="conteudo"></div>
+
+  <div class="footer">
+    Atualizado automaticamente • Sistema de Escala
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCtOYelfW1Kq2lLbH0aoRbUCqnVuol6vvQ",
+  authDomain: "cadastro-c2424.firebaseapp.com",
+  projectId: "cadastro-c2424"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const params = new URLSearchParams(window.location.search);
+const uid = params.get("uid");
+
+async function carregarEscalaPublica() {
+  const container = document.getElementById("conteudo");
+
+  if (!uid) {
+    container.innerHTML = "Link inválido.";
+    return;
+  }
+
+  const doc = await db.collection("escalasPublicas").doc(uid).get();
+  if (!doc.exists) {
+    container.innerHTML = "Escala não encontrada.";
+    return;
+  }
+
+  const { escala, recepcionistas } = doc.data();
+
+  // 🔹 Mapa de fotos
+  const mapaFotos = {};
+  recepcionistas.forEach(r => mapaFotos[r.nome] = r.fotoURL);
+
+  // 🔹 Ordena datas corretamente (YYYY-MM-DD)
+  const diasOrdenados = Object.keys(escala).sort((a, b) => new Date(a) - new Date(b));
+
+  // 🔹 Define mês baseado na primeira data salva
+  const primeiraData = new Date(diasOrdenados[0]);
+  const nomeMes = primeiraData.toLocaleDateString("pt-BR", { month: "long" });
+  const ano = primeiraData.getFullYear();
+  document.getElementById("tituloMes").innerText =
+    `📅 Escala de ${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)} ${ano}`;
+
+  diasOrdenados.forEach(dataISO => {
+    const dataObj = new Date(dataISO);
+    const dia = dataObj.getDate();
+    const mes = dataObj.getMonth() + 1;
+
+    const card = document.createElement("div");
+    card.className = "card-dia";
+    card.innerHTML = `<h3>Dia ${dia}/${mes}</h3>`;
+
+    const lista = document.createElement("div");
+    lista.className = "lista-recepcao";
+
+    escala[dataISO].forEach(p => {
+      const div = document.createElement("div");
+      div.className = "recepcionista";
+      div.innerHTML = `
+        <img src="${mapaFotos[p.nome] || ''}">
+        <span class="hora">${p.hora}</span>
+        <span>${p.nome}</span>
+      `;
+      lista.appendChild(div);
+    });
+
+    card.appendChild(lista);
+    container.appendChild(card);
+  });
+}
+
+carregarEscalaPublica();
+</script>
+</body>
+</html>
