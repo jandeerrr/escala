@@ -141,8 +141,10 @@ function montarDiasSemana() {
       chk.type = "checkbox";
 
       const hora = document.createElement("input");
-      hora.type = "time";
-      hora.disabled = true;
+hora.type = "time";
+hora.disabled = true;
+hora.value = "00:00"; // 👈 ISSO SUBSTITUI O --:--
+
 
       chk.onchange = () => {
         hora.disabled = !chk.checked;
