@@ -216,23 +216,36 @@ body {
 
 
 /*FIM RODAPÉ*/
-
-/*Botao=Notificação*/
+/* 🔔 Botão Notificação no centro da tela */
 .btn-alerta {
-  position: 50px;
-  bottom: 20px;
-  right: 20px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 9999;
 
   background: linear-gradient(135deg, #4e73df, #224abe);
   color: white;
   border: none;
   border-radius: 50px;
-  padding: 14px 18px;
-  font-size: 14px;
+  padding: 16px 22px;
+  font-size: 15px;
   font-weight: bold;
   cursor: pointer;
-  
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-alerta:hover {
+  transform: translate(-50%, -50%) scale(1.05);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.45);
+}
+
+.btn-alerta:active {
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
 
   box-shadow: 0 8px 18px rgba(0,0,0,0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
