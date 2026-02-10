@@ -301,6 +301,8 @@ body {
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+
 const firebaseConfig = {
   apiKey: "AIzaSyCtOYelfW1Kq2lLbH0aoRbUCqnVuol6vvQ",
   authDomain: "cadastro-c2424.firebaseapp.com",
@@ -313,7 +315,28 @@ const db = firebase.firestore();
 const params = new URLSearchParams(window.location.search);
 const uid = params.get("uid");
 
-let alertasAtivos = false; // controle de som + notificação
+let alertasAtivos = false;
+
+// 🔔 BOTÃO ATIVAR ALERTAS
+const btn = document.getElementById("btnAtivarAlertas");
+if (btn) {
+  btn.addEventListener("click", async () => {
+
+    const som = document.getElementById("somNotificacao");
+    if (som) {
+      try { await som.play(); som.pause(); som.currentTime = 0; } catch(e){}
+    }
+
+    if ("Notification" in window) {
+      const perm = await Notification.requestPermission();
+      if (perm === "granted") {
+        alertasAtivos = true;
+        btn.innerText = "✅ Avisos ativados";
+        btn.style.background = "linear-gradient(135deg,#1cc88a,#17a673)";
+      }
+    }
+  });
+}
 
 async function carregarEscalaPublica() {
   const container = document.getElementById("conteudo");
@@ -349,7 +372,6 @@ async function carregarEscalaPublica() {
     String(hoje.getMonth()+1).padStart(2,'0') + "-" +
     String(hoje.getDate()).padStart(2,'0');
 
-  // 🔔 AVISO DE HOJE
   if (escala[hojeISO]) {
     const nomes = escala[hojeISO]
       .map(p => `${p.nome} às ${p.hora}`)
@@ -376,13 +398,11 @@ async function carregarEscalaPublica() {
 
     document.body.appendChild(aviso);
 
-    // 🔊 Som
     if (alertasAtivos) {
       const som = document.getElementById("somNotificacao");
       if (som) som.play().catch(() => {});
     }
 
-    // 📲 Notificação
     if (alertasAtivos && "Notification" in window && Notification.permission === "granted") {
       new Notification("Recepção de Hoje", {
         body: nomes,
@@ -391,7 +411,6 @@ async function carregarEscalaPublica() {
     }
   }
 
-  // 📅 Dias futuros
   diasOrdenados.forEach(dataISO => {
     const dataObj = new Date(dataISO);
     dataObj.setHours(0,0,0,0);
@@ -422,25 +441,9 @@ async function carregarEscalaPublica() {
 
 carregarEscalaPublica();
 
-
-// 🔔 BOTÃO ATIVAR ALERTAS
-document.getElementById("btnAtivarAlertas").addEventListener("click", async () => {
-
-  const som = document.getElementById("somNotificacao");
-  if (som) {
-    try { await som.play(); som.pause(); som.currentTime = 0; } catch(e){}
-  }
-
-  if ("Notification" in window) {
-    const perm = await Notification.requestPermission();
-    if (perm === "granted") {
-      alertasAtivos = true;
-      const btn = document.getElementById("btnAtivarAlertas");
-      btn.innerText = "✅ Avisos ativados";
-      btn.style.background = "linear-gradient(135deg,#1cc88a,#17a673)";
-    }
-  }
 });
 </script>
+<audio id="somNotificacao" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"></audio>
+
 </body>
 </html>
