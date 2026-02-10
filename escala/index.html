@@ -178,6 +178,26 @@ body {
   transform: scale(1.05);
 }
 
+/*BARNNER*/
+.footer-fixo {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+              url("banner-rodape.png") center/cover no-repeat;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 12px;
+  font-size: 13px;
+  z-index: 9999;
+  flex-wrap: wrap;
+}
+
+
 /*FIM RODAPÉ*/
 </style>
 </head>
@@ -197,7 +217,7 @@ body {
 <div id="conteudo"></div>
 
 <div class="footer-fixo">
-  <img src="LOGO.png" alt="Serviço" class="footer-img">
+  <img src="banner-rodape.png" class="banner-footer" alt="Serviços de Informática">
 
   <span>💻 Instalação de Programas sem sair de casa</span>
   <span>🛠 Manutenção em Notebooks e Desktops</span>
