@@ -138,55 +138,75 @@ body {
   color: #fff;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 10px 15px;
-  font-size: 14px;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 8px 16px;
+  box-shadow: 0 -3px 10px rgba(0,0,0,0.3);
   z-index: 9999;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
   flex-wrap: wrap;
 }
 
-.footer-fixo span {
-  white-space: nowrap;
+/* Banner / Logo */
+.banner-footer {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 
-.footer-img {
-  height: 35px;
-  border-radius: 6px;
+/* Textos */
+.footer-textos {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  line-height: 1.2;
+  opacity: 0.95;
 }
 
+/* Botão WhatsApp */
 .whats-btn {
-  background: #25D366;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 25px;
-  text-decoration: none;
   display: flex;
   align-items: center;
   gap: 6px;
+  background: #25D366;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
   font-weight: bold;
-  transition: 0.3s;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform .2s ease, box-shadow .2s ease;
 }
 
 .whats-btn img {
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 .whats-btn:hover {
-  background: #1ebe5d;
   transform: scale(1.05);
+  box-shadow: 0 0 10px #25D366;
 }
 @media (max-width: 600px) {
-  .banner-footer {
-    height: 28px;
+  .footer-fixo {
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
   }
 
-  .footer-fixo {
+  .banner-footer {
+    height: 30px;
+  }
+
+  .footer-textos {
     font-size: 12px;
-    padding: 8px;
+  }
+
+  .whats-btn {
+    padding: 5px 10px;
+    font-size: 12px;
   }
 }
+
 
 /*FIM RODAPÉ*/
 </style>
@@ -205,16 +225,17 @@ body {
     </div>
   </div>
 <div id="conteudo"></div>
-
 <div class="footer-fixo">
-  <img src="LOGO2.png" alt="Serviço" class="footer-img">
+  <img src="banner.png" class="banner-footer" alt="Suporte de Informática">
 
-  <span>💻 Instalação de Programas sem sair de casa</span>
-  <span>🛠 Manutenção em Notebooks e Desktops</span>
+  <div class="footer-textos">
+    <span>💻 Instalação de Programas sem sair de casa</span>
+    <span>🛠 Manutenção em Notebooks e Desktops</span>
+  </div>
 
   <a href="https://wa.me/5592991310087" target="_blank" class="whats-btn">
     <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
-    Falar no WhatsApp
+    WhatsApp
   </a>
 </div>
 
