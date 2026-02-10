@@ -264,6 +264,10 @@ const db = firebase.firestore();
 const params = new URLSearchParams(window.location.search);
 const uid = params.get("uid");
 
+if ("Notification" in window && Notification.permission !== "granted") {
+  Notification.requestPermission();
+}
+
 async function carregarEscalaPublica() {
   const container = document.getElementById("conteudo");
 
@@ -280,28 +284,73 @@ async function carregarEscalaPublica() {
 
   const { escala, recepcionistas } = doc.data();
 
-  // 🔹 Mapa de fotos
   const mapaFotos = {};
   recepcionistas.forEach(r => mapaFotos[r.nome] = r.fotoURL);
 
-  // 🔹 Ordena datas corretamente (YYYY-MM-DD)
   const diasOrdenados = Object.keys(escala).sort((a, b) => new Date(a) - new Date(b));
 
-  // 🔹 Define mês baseado na primeira data salva
   const primeiraData = new Date(diasOrdenados[0]);
   const nomeMes = primeiraData.toLocaleDateString("pt-BR", { month: "long" });
   const ano = primeiraData.getFullYear();
   document.getElementById("tituloMes").innerText =
     `📅 Escala de ${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)} ${ano}`;
 
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+
+  const hojeISO = hoje.getFullYear() + "-" +
+    String(hoje.getMonth()+1).padStart(2,'0') + "-" +
+    String(hoje.getDate()).padStart(2,'0');
+
+  // 🔔 AVISO DE HOJE
+  if (escala[hojeISO]) {
+    let nomes = escala[hojeISO]
+      .map(p => `${p.nome} às ${p.hora}`)
+      .join(" • ");
+
+    const aviso = document.createElement("div");
+    aviso.innerHTML = `📢 Recepção de HOJE:<br>${nomes}`;
+
+    Object.assign(aviso.style, {
+      position: "fixed",
+      top: "15px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      zIndex: "9999",
+      maxWidth: "90%",
+      background: "linear-gradient(135deg,#1cc88a,#17a673)",
+      color: "white",
+      padding: "14px",
+      borderRadius: "12px",
+      boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+      textAlign: "center",
+      fontWeight: "bold"
+    });
+
+    document.body.appendChild(aviso);
+
+    // 🔊 Som (pode ser bloqueado até clique)
+    const som = document.getElementById("somNotificacao");
+    if (som) som.play().catch(() => {});
+
+    // 📲 Notificação
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Recepção de Hoje", {
+        body: nomes,
+        icon: "logo-igreja.png"
+      });
+    }
+  }
+
+  // 📅 Dias futuros
   diasOrdenados.forEach(dataISO => {
     const dataObj = new Date(dataISO);
-    const dia = dataObj.getDate();
-    const mes = dataObj.getMonth() + 1;
+    dataObj.setHours(0,0,0,0);
+    if (dataObj < hoje) return;
 
     const card = document.createElement("div");
     card.className = "card-dia";
-    card.innerHTML = `<h3>Dia ${dia}/${mes}</h3>`;
+    card.innerHTML = `<h3>Dia ${dataObj.getDate()}/${dataObj.getMonth()+1}</h3>`;
 
     const lista = document.createElement("div");
     lista.className = "lista-recepcao";
@@ -323,6 +372,7 @@ async function carregarEscalaPublica() {
 }
 
 carregarEscalaPublica();
+
 </script>
 </body>
 </html>
