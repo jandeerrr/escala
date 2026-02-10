@@ -2,463 +2,282 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Painel Admin</title>
-
-
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<title>Escala do Mês</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- WhatsApp Preview -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="📅 Escala da Recepção - Igreja Adventista 7 Dia">
+<meta property="og:description" content="Veja a escala atualizada da equipe de recepção deste mês.">
+<meta property="og:image" content="https://admescala.netlify.app/logo-igreja.png">
+<meta property="og:url" content="https://admescala.netlify.app">
 
 
 <style>
-/* (seu CSS mantido igual) */
-body { font-family: Arial; background: linear-gradient(135deg,#4CAF50,#2e7d32); margin:0; padding:10px }
-.card{background:#fff;padding:02px;border-radius:12px;box-shadow:0 8px 18px rgba(0,0,0,.15);margin-bottom:0px}
-.recepcionista-card{display:flex;align-items:center;gap:8px;margin:6px 0;background:#f9f9f9;padding:6px 10px;border-radius:8px}
-.recepcionista-card img{width:35px;height:35px;border-radius:50%;object-fit:cover;border:2px solid #4CAF50}
-#diasSemana{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
-</style>
-</head>
-<div class="topo-admin">
-  <div class="titulo-painel">
-    <img src="logo-igreja.png" alt="Logo Igreja" class="logo-painel">
-    <span>ADM - Igreja Adventista do Sétimo Dia</span>
-</div>
-
-  <button onclick="logout()" id="btnLogout" class="btn-sair">🚪 Sair</button>
-</div>
-
-<div id="menuAuth">
-  <h2>🔐 Acesso Admin</h2>
-  <input type="text" id="nomeAdmin" placeholder="Nome da clínica (somente no cadastro)"><br><br>
-  <input type="email" id="email" placeholder="Email"><br><br>
-  <input type="password" id="senha" placeholder="Senha"><br><br>
-
-  <button onclick="cadastrarAdmin()">Cadastrar Admin</button>
-  <button onclick="login()">Entrar</button>
-  <button onclick="recuperarSenha()">Esqueci a senha</button>
-  <button onclick="logout()" id="btnLogout" style="display:none;">🚪 Sair</button>
-
-  <button onclick="window.location.href='historico.html'">📚 Ver Histórico</button>
-
-  <hr>
-</div>
-
-</div>
-
-<hr>
-
-<div id="areaAdmin" style="display:none">
-
-  <div class="section-card">
-    <h2>👩‍💼 Cadastrar Recepcionista</h2>
-    <input type="text" id="nomeRecep" placeholder="Nome da recepcionista">
-    <input type="file" id="fotoRecep">
-    <button class="btn primary full" onclick="cadastrar()">💾 Salvar</button>
-
-
-  <button class="btn link" onclick="window.location.href='historico.html'">
-    📚 Histórico
-  </button>
-	<h3 class="secao-titulo" onclick="toggleListaRecep()" style="cursor:pointer;">
-  👩‍💼 Recepcionistas Cadastradas ▼
-</h3>
-
-<div id="listaRecepcionistas" class="lista-recep escondido"></div>
-
-  </div>
-
-  <div class="top-actions">
-    <button class="btn success" onclick="compartilharEscala()">📤 Compartilhar Escala</button>
-    <button class="btn danger" onclick="limparEscala()" id="btnLimpar" style="display:none;">🗑 Limpar Escala</button>
-  </div>
-
-  <h2 id="tituloMes" class="titulo-mes">📆 Escala do Mês</h2>
-  <div id="diasSemana"></div>
-
-  <hr>
-
-  <h2>📊 Escala Atual</h2>
-  <div id="historico"></div>
-</div>
-
-
-<style>
-/*booes redondos*/
-button,
-.btn {
-  border-radius: 50px; /* deixa redondo */
-  padding: 10px 18px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+.topo-title {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
-/* efeito ao passar o mouse */
-button:hover,
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #4e73df, #1cc88a);
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
 }
 
-/* efeito ao clicar */
-button:active,
-.btn:active {
-  transform: scale(0.96);
+.container {
+  max-width: 900px;
+  margin: auto;
 }
 
-button {
-  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+/* ===== CABEÇALHO ===== */
+.header { margin-bottom: 25px; }
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  padding: 14px 18px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
   color: white;
 }
 
-/* Botão salvar */
-button.primary,
-.btn.primary {
-  background: linear-gradient(135deg, #00c853, #009624);
-}
-
-/* Botão sucesso */
-button.success,
-.btn.success {
-  background: linear-gradient(135deg, #00c853, #00a152);
-}
-
-/* Botão perigo */
-button.danger,
-.btn.danger {
-  background: linear-gradient(135deg, #ff5252, #c62828);
-}
-
-/* Botão estilo link */
-button.link,
-.btn.link {
-  background: transparent;
-  color: #0d6efd;
-  box-shadow: none;
-}
-/* Deixa os botões da área de login lado a lado */
-#menuAuth button {
-  display: inline-flex;
-  width: auto;
-  margin: 5px 5px 5px 0;
-}
-
-/* Área cadastrar recepcionista */
-.section-card button {
-  display: inline-flex;
-  width: auto;
-  margin: 6px 6px 0 0;
-}
-
-/* Botões de ação (compartilhar / limpar) */
-.top-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.top-actions button {
-  flex: 1;
-  min-width: 160px;
-}
-
-/*fim redondondos*/
-
-
-
-
-img, input, button {
-  max-width: 50%;
-}
-
-/*backround*/
-body {
-    font-family: Arial;
-    background: linear-gradient(135deg, #2575fc, #fff);
-    margin: 0;
-    padding: 10px;
-}
-.titulo-painel {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-
-    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    padding: 18px 28px;
-    margin: 0px auto;
-    width: fit-content;
-
-    color: #ffffff;
-    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
-
-    border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-}
-
-.titulo-painel:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.2);
-}
-
-.logo-painel {
-    height: 42px;
-    width: auto;
-    border-radius: 8px;
-    background: #ffffff;
-    padding: 4px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-	
-/* ===== Botões modernos ===== */
-.btn {
-  border: 10;
-  border-radius: 30px;
-  padding: 1px 18px;
-  font-size: 14px;
-  cursor: pointer;
-  margin: 01px 0px;
-  transition: all .2s ease;
-  display: inline-block;
-}
-
-/* ===== Ações do topo ===== */
-.top-actions {
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-/*drop-delete*/
-.secao-titulo{
-  background: linear-gradient(90deg,#6a11cb,#2575fc);
-  color:white;
-  padding:10px 15px;
-  border-radius:10px;
-  font-weight:bold;
-  margin-top:15px;
-  user-select:none;
-}
-
-.lista-recep{
-  margin-top:10px;
-  display:grid;
-  gap:8px;
-  transition: all .3s ease;
-}
-
-.escondido{
-  display:none;
-}
-
-.recepcionista-card{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  background:#f5f7fa;
-  padding:8px 12px;
-  border-radius:12px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.08);
-}
-
-.recepcionista-card img{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  object-fit:cover;
-}
-
-
-
-.modal {
-  display:none;
-  position:fixed;
-  z-index:9999;
-  left:0; top:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.8);
-  justify-content:center;
-  align-items:center;
-}
-
-.modal-content {
-  background:#111;
-  padding:20px;
-  border-radius:10px;
-  text-align:center;
-  max-width:90%;
-}
-
-.modal-content img {
-  max-width:100%;
-  max-height:60vh;
-  border-radius:8px;
-  margin-bottom:15px;
-}
-
-.fechar {
-  color:#fff;
-  float:right;
-  font-size:28px;
-  cursor:pointer;
-}
-@media (max-width: 600px) {
-  #diasSemana {
-    grid-template-columns: repeat(4, 1fr); /* 4 cards por linha */
-    gap: 01px;
-  }
-
-  .card {
-    padding: 01px;
-  }
-
-  input, button {
-    font-size: 14px; /* inputs e botões menores no mobile */
-  }
-}
-.mes-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.dia-item {
-  background: #f9f9f9;
-  border-radius: 8px;
+.logo {
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
+  background: white;
   padding: 6px;
-  font-size: 12px;
-  box-shadow: inset 0 0 3px rgba(0,0,0,0.08);
+  object-fit: contain;
 }
 
-/*botao compartilhar flutuante*/
+.header h1 { margin: 0; font-size: 24px; }
+.header p { margin: 2px 0 0; opacity: 0.9; font-size: 14px; }
 
-#btnShareFloat {
-  position: fixed;
-  bottom: 20px;
-  right: 05px;
-  width: 70px;
-  height: 70px;
-  border-radius: 100%;
-  border: none;
-  background: #6a11cb;
-  color: #f9f9f9;
-  font-size: 09px;
-  box-shadow: 0 6px 5px rgb(0 0 0);
-  cursor: pointer;
-  z-index: 9999;
-  display: none; /* aparece só quando logado */
+/* ===== CARDS DOS DIAS ===== */
+.card-dia {
+  background: white;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-#btnShareFloat:hover {
-  transform: scale(1.1);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+.card-dia:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.12);
 }
 
-#btnShareFloat:active {
-  transform: scale(0.95);
-}
-/* ================= RESPONSIVO ================= */
-@media (max-width: 600px) {
-
-  body {
-    padding: 6px;
-    font-size: 13px;
-  }
-
-  h2 { font-size: 16px; }
-  h3 { font-size: 14px; }
-
-  .titulo-painel {
-    font-size: 12px;
-    padding: 8px;
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .logo-painel {
-    height: 28px;
-  }
-
-  input {
-    width: 100%;
-    font-size: 13px;
-    padding: 6px;
-  }
-
-  button, .btn {
-    width: 100%;
-    font-size: 13px;
-    padding: 8px;
-  }
-
-  .top-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  /* 👩‍💼 Recepcionistas */
-  .lista-recep {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-  }
-
-  .recepcionista-card {
-    flex-direction: column;
-    text-align: center;
-    font-size: 11px;
-    padding: 6px;
-  }
-
-  .recepcionista-card img {
-    width: 30px;
-    height: 30px;
-  }
-
-  /* 📅 Dias do mês */
-  #diasSemana {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-  }
-
-  .dia-item {
-    font-size: 11px;
-    padding: 5px;
-  }
-
-  /* 📤 Botão flutuante */
-  #btnShareFloat {
-    width: 48px;
-    height: 48px;
-    font-size: 10px;
-  }
+.card-dia h3 {
+  margin: 0 0 10px 0;
+  color: #4e73df;
+  font-size: 17px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
 }
 
+/* ===== MINI CARDS ===== */
+.lista-recepcao {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
 
+.recepcionista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f8f9fc;
+  border-radius: 12px;
+  padding: 10px 6px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.recepcionista:hover {
+  background: #e2e6f5;
+  transform: translateY(-2px);
+}
+
+.recepcionista img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #4e73df;
+  margin-bottom: 6px;
+}
+
+.hora {
+  font-weight: bold;
+  color: #1cc88a;
+  background: rgba(28,200,138,0.12);
+  padding: 2px 6px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+/*MENU RODAPÉ*/
+
+.footer-fixo {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 8px 12px;
+  font-size: 13px;
+  box-shadow: 0 -3px 10px rgba(0,0,0,0.3);
+  z-index: 9999;
+  flex-wrap: wrap;
+}
+
+.footer-fixo span {
+  opacity: 0.9;
+}
+
+.whats-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #25D366;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.whats-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+.whats-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #25D366;
+}
+/*FIM RODAPÉ*/
 </style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="topo">
+      <img src="logo-igreja.png" class="logo" alt="Logo Igreja">
+      <div>
+        <h1 id="tituloMes">📅 Escala do Mês</h1>
+        <p>Equipe de Recepção • ADM - Igreja Adventista do Sétimo Dia</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="conteudo"></div>
+
+  <div class="footer-fixo">
+  <span>💻 Instalação de Programas sem sair de casa</span>
+  <span>🛠 Manutenção em Notebooks e Desktops</span>
+  <a href="https://wa.me/5592991310087" target="_blank" class="whats-btn">
+    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
+    Falar no WhatsApp
+  </a>
+</div>
 
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCtOYelfW1Kq2lLbH0aoRbUCqnVuol6vvQ",
+  authDomain: "cadastro-c2424.firebaseapp.com",
+  projectId: "cadastro-c2424"
+};
 
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
+const params = new URLSearchParams(window.location.search);
+const uid = params.get("uid");
 
+async function carregarEscalaPublica() {
+  const container = document.getElementById("conteudo");
 
+  if (!uid) {
+    container.innerHTML = "Link inválido.";
+    return;
+  }
 
-<div id="escalaPrint" style="position:absolute; left:-9999px; top:0; width:600px; background:#fff; padding:20px;"></div>
-<button id="btnShareFloat" onclick="compartilharEscala()">📤 Compartilhar Escala</button>
+  const doc = await db.collection("escalasPublicas").doc(uid).get();
+  if (!doc.exists) {
+    container.innerHTML = "Escala não encontrada.";
+    return;
+  }
 
-<script src="app.js"></script>
+  const { escala, recepcionistas } = doc.data();
+
+  // 🔹 Mapa de fotos
+  const mapaFotos = {};
+  recepcionistas.forEach(r => mapaFotos[r.nome] = r.fotoURL);
+
+  // 🔹 Ordena datas corretamente (YYYY-MM-DD)
+  const diasOrdenados = Object.keys(escala).sort((a, b) => new Date(a) - new Date(b));
+
+  // 🔹 Define mês baseado na primeira data salva
+  const primeiraData = new Date(diasOrdenados[0]);
+  const nomeMes = primeiraData.toLocaleDateString("pt-BR", { month: "long" });
+  const ano = primeiraData.getFullYear();
+  document.getElementById("tituloMes").innerText =
+    `📅 Escala de ${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)} ${ano}`;
+
+  diasOrdenados.forEach(dataISO => {
+    const dataObj = new Date(dataISO);
+    const dia = dataObj.getDate();
+    const mes = dataObj.getMonth() + 1;
+
+    const card = document.createElement("div");
+    card.className = "card-dia";
+    card.innerHTML = `<h3>Dia ${dia}/${mes}</h3>`;
+
+    const lista = document.createElement("div");
+    lista.className = "lista-recepcao";
+
+    escala[dataISO].forEach(p => {
+      const div = document.createElement("div");
+      div.className = "recepcionista";
+      div.innerHTML = `
+        <img src="${mapaFotos[p.nome] || ''}">
+        <span class="hora">${p.hora}</span>
+        <span>${p.nome}</span>
+      `;
+      lista.appendChild(div);
+    });
+
+    card.appendChild(lista);
+    container.appendChild(card);
+  });
+}
+
+carregarEscalaPublica();
+</script>
 </body>
 </html>
