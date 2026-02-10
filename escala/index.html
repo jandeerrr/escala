@@ -129,7 +129,6 @@ body {
   margin-bottom: 4px;
 }
 /*MENU RODAPÉ*/
-
 .footer-fixo {
   position: fixed;
   bottom: 0;
@@ -138,42 +137,47 @@ body {
   background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
   color: #fff;
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 18px;
-  padding: 8px 12px;
-  font-size: 13px;
-  box-shadow: 0 -3px 10px rgba(0,0,0,0.3);
+  justify-content: center;
+  gap: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
   z-index: 9999;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
   flex-wrap: wrap;
 }
 
 .footer-fixo span {
-  opacity: 0.9;
+  white-space: nowrap;
+}
+
+.footer-img {
+  height: 35px;
+  border-radius: 6px;
 }
 
 .whats-btn {
+  background: #25D366;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 25px;
+  text-decoration: none;
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #25D366;
-  color: white;
-  padding: 6px 10px;
-  border-radius: 20px;
   font-weight: bold;
-  text-decoration: none;
-  transition: transform .2s ease, box-shadow .2s ease;
+  transition: 0.3s;
 }
 
 .whats-btn img {
-  width: 16px;
-  height: 16px;
+  height: 18px;
 }
 
 .whats-btn:hover {
+  background: #1ebe5d;
   transform: scale(1.05);
-  box-shadow: 0 0 10px #25D366;
 }
+
 /*FIM RODAPÉ*/
 </style>
 </head>
@@ -193,7 +197,7 @@ body {
 <div id="conteudo"></div>
 
 <div class="footer-fixo">
-  <img src="LOGO.png" alt="Serviço" class="footer-img">
+  <img src="SUA-IMAGEM-AQUI.png" alt="Serviço" class="footer-img">
 
   <span>💻 Instalação de Programas sem sair de casa</span>
   <span>🛠 Manutenção em Notebooks e Desktops</span>
