@@ -27,7 +27,8 @@ let imagemParaCompartilhar = "";
 
 // ================= AUTH =================
 auth.onAuthStateChanged(async user => {
-  const btnLogout = document.getElementById("btnLogout");
+  const btnLogout = document.getElementById("btnLogoutTopo");
+
 
   if (!user) {
     // 👇 DESLOGADO
