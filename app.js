@@ -179,10 +179,27 @@ hora.value = "00:00"; // 👈 ISSO SUBSTITUI O --:--
   }
 }
 
-async function salvarEscalaAtual(){
-  await db.collection("users").doc(auth.currentUser.uid).update({ escalaAtual });
+async function salvarEscalaAtual() {
+  const uid = auth.currentUser.uid;
+
+  // 🔹 Pega dados do admin (nome da clínica)
+  const userDoc = await db.collection("users").doc(uid).get();
+  const dadosAdmin = userDoc.data();
+
+  // 🔹 Salva escala no perfil do admin (privado)
+  await db.collection("users").doc(uid).update({ escalaAtual });
+
+  // 🔹 Salva escala pública (para a página compartilhada)
+  await db.collection("escalasPublicas").doc(uid).set({
+    nomeClinica: dadosAdmin.nomeClinica || "Sem nome",
+    escala: escalaAtual,
+    recepcionistas: recepcionistas,
+    atualizadoEm: new Date()
+  });
+
   carregarEscala();
 }
+
 
 async function carregarEscala(){
   const doc = await db.collection("users").doc(auth.currentUser.uid).get();
