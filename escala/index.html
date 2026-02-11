@@ -2,10 +2,11 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+
+
 <title>Escala do Mês</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="img/favicon.png">
-
 <!-- WhatsApp Preview -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Escala Recepção IASD">
@@ -17,19 +18,33 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:url" content="https://admescala.netlify.app/escala/index.html">
 
+
 <style>
+.topo-title {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+
 body {
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(135deg, #4e73df, #1cc88a);
   margin: 0;
   padding: 20px;
-  padding-bottom: 110px; /* espaço pro rodapé */
   min-height: 100vh;
 }
 
-.container { max-width: 900px; margin: auto; }
+.container {
+  max-width: 900px;
+  margin: auto;
+}
 
-/* CABEÇALHO */
+/* ===== CABEÇALHO ===== */
+.header { margin-bottom: 25px; }
+
 .topo {
   display: flex;
   align-items: center;
@@ -52,19 +67,24 @@ body {
   object-fit: contain;
 }
 
-/* CARDS */
+.header h1 { margin: 0; font-size: 24px; }
+.header p { margin: 2px 0 0; opacity: 0.9; font-size: 14px; }
+
+/* ===== CARDS DOS DIAS ===== */
 .card-dia {
   background: white;
   border-radius: 14px;
   padding: 16px 20px;
   margin-bottom: 14px;
   box-shadow: 0 8px 22px rgba(0,0,0,0.08);
-  transition: 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .card-dia:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 26px rgba(0,0,0,0.12);
 }
+
 .card-dia h3 {
   margin: 0 0 10px 0;
   color: #4e73df;
@@ -73,11 +93,12 @@ body {
   padding-bottom: 6px;
 }
 
-/* MINI CARDS */
+/* ===== MINI CARDS ===== */
 .lista-recepcao {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 8px;
+  margin-top: 8px;
 }
 
 .recepcionista {
@@ -88,8 +109,9 @@ body {
   border-radius: 12px;
   padding: 10px 6px;
   text-align: center;
-  transition: 0.2s;
+  transition: all 0.2s ease;
 }
+
 .recepcionista:hover {
   background: #e2e6f5;
   transform: translateY(-2px);
@@ -102,7 +124,6 @@ body {
   object-fit: cover;
   border: 2px solid #4e73df;
   margin-bottom: 6px;
-  background: #ddd;
 }
 
 .hora {
@@ -114,26 +135,41 @@ body {
   font-size: 12px;
   margin-bottom: 4px;
 }
-
-/* RODAPÉ */
+/*MENU RODAPÉ*/
 .footer-fixo {
   position: fixed;
   bottom: 0;
+  left: 0;
   width: 100%;
   background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 14px;
   padding: 8px 16px;
   box-shadow: 0 -3px 10px rgba(0,0,0,0.3);
-  flex-wrap: wrap;
   z-index: 9999;
+  flex-wrap: wrap;
 }
 
-.banner-footer { height: 40px; }
-.footer-textos { font-size: 13px; }
+/* Banner / Logo */
+.banner-footer {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
 
+/* Textos */
+.footer-textos {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  line-height: 1.2;
+  opacity: 0.95;
+}
+
+/* Botão WhatsApp */
 .whats-btn {
   display: flex;
   align-items: center;
@@ -144,15 +180,50 @@ body {
   border-radius: 20px;
   font-weight: bold;
   text-decoration: none;
+  white-space: nowrap;
+  transition: transform .2s ease, box-shadow .2s ease;
 }
 
-/* BOTÃO ALERTA */
+.whats-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+.whats-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #25D366;
+}
+@media (max-width: 600px) {
+  .footer-fixo {
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .banner-footer {
+    height: 30px;
+  }
+
+  .footer-textos {
+    font-size: 12px;
+  }
+
+  .whats-btn {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}
+
+
+/*FIM RODAPÉ*/
+/* 🔔 Botão Notificação no centro da tela */
 .btn-alerta {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 9999;
+
   background: linear-gradient(135deg, #4e73df, #224abe);
   color: white;
   border: none;
@@ -161,47 +232,62 @@ body {
   font-size: 15px;
   font-weight: bold;
   cursor: pointer;
+
   box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-  transition: 0.2s;
+  transition: all 0.2s ease;
 }
-.btn-alerta.hide {
-  opacity: 0;
-  pointer-events: none;
-  transform: translate(-50%, -50%) scale(0.8);
+
+.btn-alerta:hover {
+  transform: translate(-50%, -50%) scale(1.05);
 }
+
+.btn-alerta:active {
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+
+  
+
+
 </style>
 </head>
 
 <body>
 
-<button id="btnAtivarAlertas" class="btn-alerta">🔔 Ativar</button>
-
+<button id="btnAtivarAlertas" class="btn-alerta">
+🔔 Ativar
+</button>
 <div class="container">
-  <div class="topo">
-    <img src="logo-igreja.png" class="logo">
-    <div>
-      <h1 id="tituloMes">📅 Escala do Mês</h1>
-      <p>Equipe de Recepção • ADM - Igreja Adventista do Sétimo Dia</p>
+
+  <div class="header">
+    <div class="topo">
+      <img src="logo-igreja.png" class="logo" alt="Logo Igreja">
+      <div>
+        <h1 id="tituloMes">📅 Escala do Mês</h1>
+        <p>Equipe de Recepção • ADM - Igreja Adventista do Sétimo Dia</p>
+      </div>
     </div>
   </div>
-  <div id="conteudo"></div>
-</div>
-
+<div id="conteudo"></div>
 <div class="footer-fixo">
-  <img src="banner-rodape2.JPG" class="banner-footer">
+  <img src="banner-rodape2.JPG" class="banner-footer" alt="Suporte de Informática">
+
   <div class="footer-textos">
     <span>💻 Instalação de Programas sem sair de casa</span>
     <span>🛠 Manutenção em Notebooks e Desktops</span>
   </div>
+
   <a href="https://wa.me/5592991310087" target="_blank" class="whats-btn">
-    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" width="16"> WhatsApp
+    <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
+    WhatsApp
   </a>
 </div>
+
+
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <audio id="somNotificacao" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"></audio>
-
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -213,55 +299,109 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const uid = new URLSearchParams(window.location.search).get("uid");
 
+const params = new URLSearchParams(window.location.search);
+const uid = params.get("uid");
+
+let alertasAtivos = false;
+
+// 🔔 BOTÃO ATIVAR ALERTAS
 const btn = document.getElementById("btnAtivarAlertas");
-btn?.addEventListener("click", async () => {
-  const som = document.getElementById("somNotificacao");
-  try { await som.play(); som.pause(); som.currentTime = 0; } catch(e){}
-  if ("Notification" in window) {
-    const perm = await Notification.requestPermission();
-    if (perm === "granted") {
-      btn.innerText = "✅ Avisos ativados";
-      btn.style.background = "linear-gradient(135deg,#1cc88a,#17a673)";
-      setTimeout(() => btn.classList.add("hide"), 1200);
-      verificarAvisoHoje();
+if (btn) {
+  btn.addEventListener("click", async () => {
+
+    const som = document.getElementById("somNotificacao");
+    if (som) {
+      try { await som.play(); som.pause(); som.currentTime = 0; } catch(e){}
     }
-  }
-});
 
-async function verificarAvisoHoje() {
-  if (!uid) return;
-  const doc = await db.collection("escalasPublicas").doc(uid).get();
-  if (!doc.exists) return;
-  const { escala } = doc.data();
-  const hojeISO = new Date().toISOString().split("T")[0];
-  if (!escala[hojeISO]) return;
-
-  const nomes = escala[hojeISO].map(p => `${p.nome} às ${p.hora}`).join(" • ");
-  new Notification("Recepção de Hoje", { body: nomes, icon: "logo-igreja.png" });
+    if ("Notification" in window) {
+      const perm = await Notification.requestPermission();
+      if (perm === "granted") {
+        alertasAtivos = true;
+        btn.innerText = "✅ Avisos ativados";
+        btn.style.background = "linear-gradient(135deg,#1cc88a,#17a673)";
+      }
+    }
+  });
 }
 
 async function carregarEscalaPublica() {
   const container = document.getElementById("conteudo");
-  if (!uid) return container.innerHTML = "Link inválido.";
+
+  if (!uid) {
+    container.innerHTML = "Link inválido.";
+    return;
+  }
 
   const doc = await db.collection("escalasPublicas").doc(uid).get();
-  if (!doc.exists) return container.innerHTML = "Escala não encontrada.";
+  if (!doc.exists) {
+    container.innerHTML = "Escala não encontrada.";
+    return;
+  }
 
   const { escala, recepcionistas } = doc.data();
+
   const mapaFotos = {};
   recepcionistas.forEach(r => mapaFotos[r.nome] = r.fotoURL);
 
-  const dias = Object.keys(escala).sort((a,b)=>new Date(a)-new Date(b));
-  const primeira = new Date(dias[0]);
+  const diasOrdenados = Object.keys(escala).sort((a, b) => new Date(a) - new Date(b));
+
+  const primeiraData = new Date(diasOrdenados[0]);
+  const nomeMes = primeiraData.toLocaleDateString("pt-BR", { month: "long" });
+  const ano = primeiraData.getFullYear();
   document.getElementById("tituloMes").innerText =
-    `📅 Escala de ${primeira.toLocaleDateString("pt-BR",{month:"long"})} ${primeira.getFullYear()}`;
+    `📅 Escala de ${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)} ${ano}`;
 
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
 
-  dias.forEach(dataISO => {
-    const dataObj = new Date(dataISO); dataObj.setHours(0,0,0,0);
+  const hojeISO = hoje.getFullYear() + "-" +
+    String(hoje.getMonth()+1).padStart(2,'0') + "-" +
+    String(hoje.getDate()).padStart(2,'0');
+
+  if (escala[hojeISO]) {
+    const nomes = escala[hojeISO]
+      .map(p => `${p.nome} às ${p.hora}`)
+      .join(" • ");
+
+    const aviso = document.createElement("div");
+    aviso.innerHTML = `📢 Recepção de HOJE:<br>${nomes}`;
+
+    Object.assign(aviso.style, {
+      position: "fixed",
+      top: "15px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      zIndex: "9999",
+      maxWidth: "90%",
+      background: "linear-gradient(135deg,#1cc88a,#17a673)",
+      color: "white",
+      padding: "14px",
+      borderRadius: "12px",
+      boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+      textAlign: "center",
+      fontWeight: "bold"
+    });
+
+    document.body.appendChild(aviso);
+
+    if (alertasAtivos) {
+      const som = document.getElementById("somNotificacao");
+      if (som) som.play().catch(() => {});
+    }
+
+    if (alertasAtivos && "Notification" in window && Notification.permission === "granted") {
+      new Notification("Recepção de Hoje", {
+        body: nomes,
+        icon: "logo-igreja.png"
+      });
+    }
+  }
+
+  diasOrdenados.forEach(dataISO => {
+    const dataObj = new Date(dataISO);
+    dataObj.setHours(0,0,0,0);
     if (dataObj < hoje) return;
 
     const card = document.createElement("div");
@@ -272,12 +412,14 @@ async function carregarEscalaPublica() {
     lista.className = "lista-recepcao";
 
     escala[dataISO].forEach(p => {
-      lista.innerHTML += `
-        <div class="recepcionista">
-          <img src="${mapaFotos[p.nome] || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}">
-          <span class="hora">${p.hora}</span>
-          <span>${p.nome}</span>
-        </div>`;
+      const div = document.createElement("div");
+      div.className = "recepcionista";
+      div.innerHTML = `
+        <img src="${mapaFotos[p.nome] || ''}">
+        <span class="hora">${p.hora}</span>
+        <span>${p.nome}</span>
+      `;
+      lista.appendChild(div);
     });
 
     card.appendChild(lista);
@@ -286,8 +428,10 @@ async function carregarEscalaPublica() {
 }
 
 carregarEscalaPublica();
+
 });
 </script>
+
 
 </body>
 </html>
