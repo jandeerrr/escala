@@ -29,14 +29,12 @@ let imagemParaCompartilhar = "";
 auth.onAuthStateChanged(async user => {
   const btnLogout = document.getElementById("btnLogoutTopo");
 
-
   if (!user) {
-    // 👇 DESLOGADO
     menuAuth.style.display = "block";
     areaAdmin.style.display = "none";
     btnLimpar.style.display = "none";
     btnShareFloat.style.display = "none";
-    btnLogout.style.display = "none";
+    if (btnLogout) btnLogout.style.display = "none";
     return;
   }
 
@@ -48,18 +46,18 @@ auth.onAuthStateChanged(async user => {
     return;
   }
 
-  // 👇 LOGADO COMO ADMIN
   menuAuth.style.display = "none";
   areaAdmin.style.display = "block";
   btnLimpar.style.display = "inline-block";
   btnShareFloat.style.display = "block";
-  btnLogout.style.display = "inline-block";
+  if (btnLogout) btnLogout.style.display = "inline-block";
 
   atualizarTituloMes();
   await carregarRecepcionistas();
   await carregarEscala();
   montarDiasSemana();
 });
+
 
 
 
