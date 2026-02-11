@@ -23,13 +23,15 @@ body { font-family: Arial; background: linear-gradient(135deg,#4CAF50,#2e7d32); 
 #diasSemana{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
 </style>
 </head>
+<body>
 <div class="topo-admin">
   <div class="titulo-painel">
     <img src="logo-igreja.png" alt="Logo Igreja" class="logo-painel">
     <span>ADM - Igreja Adventista do Sétimo Dia</span>
 </div>
 
-  <button onclick="logout()" id="btnLogout" class="btn-sair">🚪 Sair</button>
+  <button onclick="logout()" id="btnLogoutMenu" style="display:none;">🚪 Sair</button>
+
 </div>
 
 <div id="menuAuth">
