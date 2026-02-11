@@ -321,9 +321,44 @@ if (btn) {
         alertasAtivos = true;
         btn.innerText = "✅ Avisos ativados";
         btn.style.background = "linear-gradient(135deg,#1cc88a,#17a673)";
+
+        // 👉 Verifica aviso de HOJE na hora
+        verificarAvisoHoje();
       }
     }
   });
+}
+
+async function verificarAvisoHoje() {
+  if (!uid) return;
+
+  const doc = await db.collection("escalasPublicas").doc(uid).get();
+  if (!doc.exists) return;
+
+  const { escala } = doc.data();
+
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+
+  const hojeISO = hoje.getFullYear() + "-" +
+    String(hoje.getMonth()+1).padStart(2,'0') + "-" +
+    String(hoje.getDate()).padStart(2,'0');
+
+  if (!escala[hojeISO]) return;
+
+  const nomes = escala[hojeISO]
+    .map(p => `${p.nome} às ${p.hora}`)
+    .join(" • ");
+
+  const som = document.getElementById("somNotificacao");
+  if (som) som.play().catch(()=>{});
+
+  if ("Notification" in window && Notification.permission === "granted") {
+    new Notification("Recepção de Hoje", {
+      body: nomes,
+      icon: "logo-igreja.png"
+    });
+  }
 }
 
 async function carregarEscalaPublica() {
@@ -356,6 +391,34 @@ async function carregarEscalaPublica() {
   const hoje = new Date();
   hoje.setHours(0,0,0,0);
 
+  diasOrdenados.forEach(dataISO => {
+    const dataObj = new Date(dataISO);
+    dataObj.setHours(0,0,0,0);
+    if (dataObj < hoje) return;
+
+    const card = document.createElement("div");
+    card.className = "card-dia";
+    card.innerHTML = `<h3>Dia ${dataObj.getDate()}/${dataObj.getMonth()+1}</h3>`;
+
+    const lista = document.createElement("div");
+    lista.className = "lista-recepcao";
+
+    escala[dataISO].forEach(p => {
+      const div = document.createElement("div");
+      div.className = "recepcionista";
+      div.innerHTML = `
+        <img src="${mapaFotos[p.nome] || ''}">
+        <span class="hora">${p.hora}</span>
+        <span>${p.nome}</span>
+      `;
+      lista.appendChild(div);
+    });
+
+    card.appendChild(lista);
+    container.appendChild(card);
+  });
+
+  // Mostra aviso visual no topo (sem notificação ainda)
   const hojeISO = hoje.getFullYear() + "-" +
     String(hoje.getMonth()+1).padStart(2,'0') + "-" +
     String(hoje.getDate()).padStart(2,'0');
@@ -385,52 +448,14 @@ async function carregarEscalaPublica() {
     });
 
     document.body.appendChild(aviso);
-
-    if (alertasAtivos) {
-      const som = document.getElementById("somNotificacao");
-      if (som) som.play().catch(() => {});
-    }
-
-    if (alertasAtivos && "Notification" in window && Notification.permission === "granted") {
-      new Notification("Recepção de Hoje", {
-        body: nomes,
-        icon: "logo-igreja.png"
-      });
-    }
   }
-
-  diasOrdenados.forEach(dataISO => {
-    const dataObj = new Date(dataISO);
-    dataObj.setHours(0,0,0,0);
-    if (dataObj < hoje) return;
-
-    const card = document.createElement("div");
-    card.className = "card-dia";
-    card.innerHTML = `<h3>Dia ${dataObj.getDate()}/${dataObj.getMonth()+1}</h3>`;
-
-    const lista = document.createElement("div");
-    lista.className = "lista-recepcao";
-
-    escala[dataISO].forEach(p => {
-      const div = document.createElement("div");
-      div.className = "recepcionista";
-      div.innerHTML = `
-        <img src="${mapaFotos[p.nome] || ''}">
-        <span class="hora">${p.hora}</span>
-        <span>${p.nome}</span>
-      `;
-      lista.appendChild(div);
-    });
-
-    card.appendChild(lista);
-    container.appendChild(card);
-  });
 }
 
 carregarEscalaPublica();
 
 });
 </script>
+
 
 
 </body>
