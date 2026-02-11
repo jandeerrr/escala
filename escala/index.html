@@ -245,6 +245,13 @@ body {
   transform: translate(-50%, -50%) scale(0.95);
 }
 
+/*botao notificação*/
+.btn-alerta.hide {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.8);
+}
+
 
   
 
@@ -321,6 +328,7 @@ if (btn) {
         alertasAtivos = true;
         btn.innerText = "✅ Avisos ativados";
         btn.style.background = "linear-gradient(135deg,#1cc88a,#17a673)";
+		btn.classList.add("hide"); // 👈 ESCONDE
       }
     }
   });
