@@ -417,6 +417,12 @@ async function carregarEscalaPublica() {
     card.appendChild(lista);
     container.appendChild(card);
   });
+if ("Notification" in window) {
+  if (Notification.permission === "denied") {
+    alert("🚫 Notificações estão bloqueadas no navegador.\nAtive manualmente nas configurações do site.");
+    return;
+  }
+}
 
   // Mostra aviso visual no topo (sem notificação ainda)
   const hojeISO = hoje.getFullYear() + "-" +
